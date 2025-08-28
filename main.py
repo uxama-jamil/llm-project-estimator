@@ -7,34 +7,40 @@ from parser.json_output_parser import JSONOutputParser
 from processor.document_processor import DocumentProcessor
 from parser.json_to_excel_parser import json_to_excel
 from dotenv import load_dotenv
+import google.generativeai as genai
 
 load_dotenv()
 
 class ProjectEstimationSystem:
     """Main system for generating project estimations from documents"""
     
-    def __init__(self, ollama_model: str = "llama3.2"):
+    def __init__(self, model: str = "llama3.2:3b"):
         """Initialize the system with Ollama LLM"""
         try:
-            self.llm = Ollama(
-                model=ollama_model,
-                temperature=0.3,
-                num_predict=4000
-            )
+            self.model = model
+            if "gemini" in model:
+                genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+                self.llm = genai.GenerativeModel(model)
+            else:
+                self.llm = Ollama(
+                    model=model,
+                    temperature=0.3,
+                    num_predict=4000
+                )
             self.output_parser = JSONOutputParser()
             self.doc_processor = DocumentProcessor()
-            print(f"Initialized with model: {ollama_model}")
+            print(f"Initialized with model: {model}")
         except Exception as e:
-            raise Exception(f"Failed to initialize Ollama model '{ollama_model}': {e}")
+            raise Exception(f"Failed to initialize Ollama model '{model}': {e}")
         
         # Create a more focused prompt template
         self.prompt_template = PromptTemplate(
             input_variables=["document_content"],
             template="""
-     You are an expert software project manager and technical lead with extensive experience in project estimation and planning. Analyze the following project specification document and provide a detailed breakdown with accurate estimations.
+You are an expert software project manager and technical lead with extensive experience in project estimation and planning. Analyze the following project specification document and provide a detailed breakdown with accurate estimations.
 
-    DOCUMENT:
-    {document_content}
+DOCUMENT:
+{document_content}
 
 INSTRUCTIONS:
 1. Carefully read and understand the entire project specification
@@ -154,7 +160,10 @@ Ensure all estimates are realistic and based on the actual requirements specifie
                         f.write(prompt)
                     
                     # Get LLM response
-                    response = self.llm.invoke(prompt)
+                    if "gemini" in self.model:
+                        response = self.llm.generate_content(prompt)
+                    else:
+                        response = self.llm.invoke(prompt)
                     
                     if not response or len(response.strip()) < 10:
                         raise ValueError("Empty or too short response from LLM")
@@ -441,7 +450,7 @@ def main():
     # Configuration
     DOCUMENT_PATH = os.getenv("DOCUMENT_PATH", "sampleproject.pdf")  # Update this path
     OUTPUT_PATH = os.getenv("OUTPUT_PATH", "project_estimation.json")
-    OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:latest")
+    MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
     
     # # Step 1: Test Ollama connection
     # print("\n1. Testing Ollama connection...")
@@ -462,13 +471,15 @@ def main():
     # Step 3: Process document
     try:
         print("\n3. Initializing estimation system...")
-        estimation_system = ProjectEstimationSystem(ollama_model=OLLAMA_MODEL)
+        estimation_system = ProjectEstimationSystem(model=MODEL)
         
         print("\n4. Processing document and generating estimation...")
         estimation_data = estimation_system.process_document_and_estimate(DOCUMENT_PATH)
-        json_to_excel(estimation_data, "estimation_data.xlsx")
-        print("\n5. Saving results...")
+        print("\n5. Saving results to JSON...")
         estimation_system.save_estimation(estimation_data, OUTPUT_PATH)
+        print("\n6. Converting to Excel...")
+        json_to_excel(estimation_data, "estimation_data.xlsx")
+        print("\n7. Done!")
         
         
         # Step 4: Display summary
