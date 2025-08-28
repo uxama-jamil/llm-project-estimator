@@ -2,3 +2,6 @@ langchain
 langchain-community
 PyPDF2
 python-docx
+pandas 
+openpyxl
+python-dotenv

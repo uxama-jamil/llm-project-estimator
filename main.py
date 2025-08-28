@@ -5,8 +5,10 @@ from langchain_community.llms import Ollama
 from langchain.prompts import PromptTemplate
 from parser.json_output_parser import JSONOutputParser
 from processor.document_processor import DocumentProcessor
+from parser.json_to_excel_parser import json_to_excel
+from dotenv import load_dotenv
 
-
+load_dotenv()
 
 class ProjectEstimationSystem:
     """Main system for generating project estimations from documents"""
@@ -146,6 +148,10 @@ Ensure all estimates are realistic and based on the actual requirements specifie
                     
                     # Generate prompt
                     prompt = self.prompt_template.format(document_content=document_content)
+                    
+                    # Save prompt to a text file
+                    with open("prompt.txt", "w", encoding="utf-8") as f:
+                        f.write(prompt)
                     
                     # Get LLM response
                     response = self.llm.invoke(prompt)
@@ -433,9 +439,9 @@ def main():
     print("=" * 60)
     
     # Configuration
-    DOCUMENT_PATH = "sampleproject.pdf"  # Update this path
-    OUTPUT_PATH = "project_estimation.json"
-    OLLAMA_MODEL = "llama3.2:3b"
+    DOCUMENT_PATH = os.getenv("DOCUMENT_PATH", "sampleproject.pdf")  # Update this path
+    OUTPUT_PATH = os.getenv("OUTPUT_PATH", "project_estimation.json")
+    OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:latest")
     
     # # Step 1: Test Ollama connection
     # print("\n1. Testing Ollama connection...")
@@ -460,9 +466,10 @@ def main():
         
         print("\n4. Processing document and generating estimation...")
         estimation_data = estimation_system.process_document_and_estimate(DOCUMENT_PATH)
-        
+        json_to_excel(estimation_data, "estimation_data.xlsx")
         print("\n5. Saving results...")
         estimation_system.save_estimation(estimation_data, OUTPUT_PATH)
+        
         
         # Step 4: Display summary
         print("\n" + "=" * 60)
