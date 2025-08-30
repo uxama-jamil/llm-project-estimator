@@ -1,4 +1,6 @@
 import os
+os.environ["OLLAMA_USE_GPU"] = "1"   # or "cuda"
+
 import json
 from typing import Dict, Any
 from langchain_community.llms import Ollama
@@ -25,7 +27,7 @@ class ProjectEstimationSystem:
                 self.llm = Ollama(
                     model=model,
                     temperature=0.3,
-                    num_predict=4000
+                    num_predict=4000 #Maximum number of tokens the model will generate
                 )
             self.output_parser = JSONOutputParser()
             self.doc_processor = DocumentProcessor()
@@ -169,7 +171,8 @@ Ensure all estimates are realistic and based on the actual requirements specifie
                         raise ValueError("Empty or too short response from LLM")
                     
                     print(f"Received response, length: {len(response)} characters")
-                    
+                    with open("response.txt", "w", encoding="utf-8") as ff:
+                        ff.write(response)
                     # Parse JSON response
                     estimation_data = self.output_parser.parse(response)
                     
@@ -194,7 +197,7 @@ Ensure all estimates are realistic and based on the actual requirements specifie
             
             # Generate fallback if all attempts failed
             print("Generating fallback estimation...")
-            return self._generate_fallback_estimation(document_content)
+            return {}
             
         except Exception as e:
             print(f"Critical error in processing: {str(e)}")
@@ -257,156 +260,7 @@ Ensure all estimates are realistic and based on the actual requirements specifie
         except Exception as e:
             print(f"Validation error: {e}")
             return False
-    
-    def _generate_fallback_estimation(self, document_content: str) -> Dict[str, Any]:
-        """Generate a basic fallback estimation if LLM fails"""
-        print("Generating fallback estimation based on document analysis...")
-        
-        # Simple content analysis
-        word_count = len(document_content.split())
-        lines = len(document_content.split('\n'))
-        
-        # Basic complexity estimation
-        complexity_indicators = ['api', 'database', 'authentication', 'payment', 'integration', 
-                               'mobile', 'web', 'frontend', 'backend', 'microservice']
-        
-        complexity_score = sum(1 for indicator in complexity_indicators 
-                             if indicator.lower() in document_content.lower())
-        
-        # Calculate base hours (minimum 40, scale with content and complexity)
-        base_hours = max(40, (word_count // 20) + (complexity_score * 10))
-        min_hours = base_hours
-        max_hours = int(base_hours * 1.6)  # 60% buffer
-        
-        # Estimate duration and team size
-        duration_weeks = max(2, base_hours // 40)
-        team_size = max(1, base_hours // 120)
-        
-        return {
-            "project_overview": {
-                "title": "Software Development Project (Auto-generated)",
-                "description": f"Project estimation based on document analysis. Document contains {word_count} words with complexity score {complexity_score}.",
-                "total_min_hours": min_hours,
-                "total_max_hours": max_hours,
-                "estimated_duration_weeks": duration_weeks,
-                "team_size_recommended": team_size
-            },
-            "tasks": [
-                {
-                    "task_id": "T001",
-                    "task_name": "Project Planning & Requirements",
-                    "description": "Initial planning and requirements gathering phase",
-                    "subtasks": [
-                        {
-                            "subtask_id": "ST001",
-                            "subtask_name": "Requirements Analysis",
-                            "description": "Analyze and document project requirements",
-                            "min_hours": 16,
-                            "max_hours": 24,
-                            "skills_required": ["Business Analysis", "Documentation"],
-                            "complexity": 2,
-                            "dependencies": ["Stakeholder availability"],
-                            "assumptions": ["Requirements are accessible"]
-                        }
-                    ],
-                    "task_total_min_hours": 16,
-                    "task_total_max_hours": 24,
-                    "critical_path": True
-                },
-                {
-                    "task_id": "T002",
-                    "task_name": "Development",
-                    "description": "Core development activities",
-                    "subtasks": [
-                        {
-                            "subtask_id": "ST002",
-                            "subtask_name": "Core Implementation",
-                            "description": "Implement main functionality",
-                            "min_hours": min_hours - 32,
-                            "max_hours": max_hours - 48,
-                            "skills_required": ["Programming", "Software Development"],
-                            "complexity": 4,
-                            "dependencies": ["Requirements completion", "Environment setup"],
-                            "assumptions": ["Development tools available"]
-                        }
-                    ],
-                    "task_total_min_hours": min_hours - 32,
-                    "task_total_max_hours": max_hours - 48,
-                    "critical_path": True
-                },
-                {
-                    "task_id": "T003",
-                    "task_name": "Testing & Deployment",
-                    "description": "Quality assurance and deployment",
-                    "subtasks": [
-                        {
-                            "subtask_id": "ST003",
-                            "subtask_name": "Testing & QA",
-                            "description": "Test application and ensure quality",
-                            "min_hours": 16,
-                            "max_hours": 24,
-                            "skills_required": ["Testing", "QA"],
-                            "complexity": 3,
-                            "dependencies": ["Development completion"],
-                            "assumptions": ["Test environment ready"]
-                        }
-                    ],
-                    "task_total_min_hours": 16,
-                    "task_total_max_hours": 24,
-                    "critical_path": False
-                }
-            ],
-            "risks_and_considerations": [
-                {
-                    "risk": "Requirements may be incomplete or unclear",
-                    "impact": "Medium",
-                    "mitigation": "Schedule regular stakeholder reviews and clarification sessions"
-                },
-                {
-                    "risk": "Technical complexity may be underestimated",
-                    "impact": "High",
-                    "mitigation": "Include technical spikes and proof of concepts in planning"
-                }
-            ],
-            "resource_requirements": {
-                "skills_summary": {
-                    "Business Analysis": 24,
-                    "Software Development": max_hours - 48,
-                    "Testing": 24,
-                    "Project Management": 16
-                },
-                "team_composition": [
-                    {
-                        "role": "Business Analyst",
-                        "skills": ["Business Analysis", "Documentation"],
-                        "estimated_hours": 24
-                    },
-                    {
-                        "role": "Software Developer",
-                        "skills": ["Programming", "Software Development"],
-                        "estimated_hours": max_hours - 48
-                    },
-                    {
-                        "role": "QA Tester",
-                        "skills": ["Testing", "QA"],
-                        "estimated_hours": 24
-                    }
-                ]
-            },
-            "assumptions": [
-                "Development environment and tools are available",
-                "Team members have required technical skills",
-                "Stakeholders are available for regular reviews",
-                "No major changes to requirements during development"
-            ],
-            "recommendations": [
-                "Conduct detailed requirements gathering before starting development",
-                "Plan for regular progress reviews and stakeholder feedback",
-                "Include buffer time for unforeseen technical challenges",
-                "Establish clear communication channels with all stakeholders"
-            ]
-        }
-    
+      
     def save_estimation(self, estimation_data: Dict[str, Any], output_path: str):
         """Save estimation data to JSON file"""
         try:
