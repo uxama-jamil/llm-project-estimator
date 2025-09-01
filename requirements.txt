@@ -5,4 +5,4 @@ python-docx
 pandas 
 openpyxl
 python-dotenv
-google-generativeai
+langchain-groq

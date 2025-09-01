@@ -1,34 +1,23 @@
 import os
-os.environ["OLLAMA_USE_GPU"] = "1"   # or "cuda"
-
 import json
 from typing import Dict, Any
-from langchain_community.llms import Ollama
 from langchain.prompts import PromptTemplate
 from parser.json_output_parser import JSONOutputParser
 from processor.document_processor import DocumentProcessor
 from parser.json_to_excel_parser import json_to_excel
+from langchain_groq import ChatGroq
 from dotenv import load_dotenv
-import google.generativeai as genai
 
 load_dotenv()
 
 class ProjectEstimationSystem:
     """Main system for generating project estimations from documents"""
     
-    def __init__(self, model: str = "llama3.2:3b"):
+    def __init__(self, model: str = "llama-3.3-70b-versatile"):
         """Initialize the system with Ollama LLM"""
         try:
             self.model = model
-            if "gemini" in model:
-                genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-                self.llm = genai.GenerativeModel(model)
-            else:
-                self.llm = Ollama(
-                    model=model,
-                    temperature=0.3,
-                    num_predict=4000 #Maximum number of tokens the model will generate
-                )
+            self.llm = ChatGroq(api_key=os.getenv("GROQ_API_KEY"), model_name=model, temperature=0.3)
             self.output_parser = JSONOutputParser()
             self.doc_processor = DocumentProcessor()
             print(f"Initialized with model: {model}")
@@ -162,19 +151,16 @@ Ensure all estimates are realistic and based on the actual requirements specifie
                         f.write(prompt)
                     
                     # Get LLM response
-                    if "gemini" in self.model:
-                        response = self.llm.generate_content(prompt)
-                    else:
                         response = self.llm.invoke(prompt)
-                    
-                    if not response or len(response.strip()) < 10:
+                
+                    if not response or len(response.content.strip()) < 10:
                         raise ValueError("Empty or too short response from LLM")
                     
-                    print(f"Received response, length: {len(response)} characters")
+                    print(f"Received response, length: {len(response.content)} characters")
                     with open("response.txt", "w", encoding="utf-8") as ff:
-                        ff.write(response)
+                        ff.write(response.content)
                     # Parse JSON response
-                    estimation_data = self.output_parser.parse(response)
+                    estimation_data = self.output_parser.parse(response.content)
                     
                     # Validate the parsed data
                     if self._validate_estimation_structure(estimation_data):
@@ -304,7 +290,7 @@ def main():
     # Configuration
     DOCUMENT_PATH = os.getenv("DOCUMENT_PATH", "sampleproject.pdf")  # Update this path
     OUTPUT_PATH = os.getenv("OUTPUT_PATH", "project_estimation.json")
-    MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
+    MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
     
     # # Step 1: Test Ollama connection
     # print("\n1. Testing Ollama connection...")
@@ -356,10 +342,6 @@ def main():
         print(f"\n✗ Error during processing: {e}")
         print("\nIf the error persists, try:")
         print("- Using a smaller/simpler document")
-        print("- Checking if the document is readable")
-        print("- Restarting Ollama service")
 
 if __name__ == "__main__":
-    print("Required packages: pip install langchain langchain-community PyPDF2 python-docx")
-    print()
     main()
