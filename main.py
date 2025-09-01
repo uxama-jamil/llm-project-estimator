@@ -169,30 +169,6 @@ class ProjectEstimationSystem:
         except Exception as e:
             raise Exception(f"Error saving estimation: {e}")
 
-def test_ollama_connection(model_name: str = "llama3.2") -> bool:
-    """Test if Ollama is working and model is available"""
-    try:
-        print(f"Testing connection to Ollama model: {model_name}")
-        llm = Ollama(model=model_name, temperature=0.1)
-        
-        # Simple test
-        response = llm.invoke("Say 'Hello' in JSON format like {\"message\": \"Hello\"}")
-        print(f"Test response: {response}")
-        
-        if "hello" in response.lower() or "Hello" in response:
-            print("✓ Ollama connection successful")
-            return True
-        else:
-            print("⚠ Ollama responded but format unexpected")
-            return False
-            
-    except Exception as e:
-        print(f"✗ Ollama connection failed: {e}")
-        print("\nTroubleshooting steps:")
-        print("1. Start Ollama: ollama serve")
-        print(f"2. Check if model exists: ollama list")
-        print(f"3. Install model if needed: ollama pull {model_name}")
-        return False
 
 def main():
     """Main function with comprehensive error handling"""
