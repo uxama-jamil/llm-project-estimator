@@ -13,7 +13,7 @@ load_dotenv()
 class ProjectEstimationSystem:
     """Main system for generating project estimations from documents"""
     
-    def __init__(self, model: str = "llama-3.3-70b-versatile"):
+    def __init__(self, model: str = "openai/gpt-oss-20b"):
         """Initialize the system with Ollama LLM"""
         try:
             self.model = model
@@ -290,13 +290,7 @@ def main():
     # Configuration
     DOCUMENT_PATH = os.getenv("DOCUMENT_PATH", "sampleproject.pdf")  # Update this path
     OUTPUT_PATH = os.getenv("OUTPUT_PATH", "project_estimation.json")
-    MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
-    
-    # # Step 1: Test Ollama connection
-    # print("\n1. Testing Ollama connection...")
-    # if not test_ollama_connection(OLLAMA_MODEL):
-    #     print("Please fix Ollama setup before continuing.")
-    #     return
+    MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
     
     # Step 2: Check if document exists
     print(f"\n2. Checking document: {DOCUMENT_PATH}")
