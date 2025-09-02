@@ -23,7 +23,7 @@ An AI-powered project estimation tool that analyzes project specification docume
 1. **Clone the repository**
 
    ```bash
-   git clone <https://github.com/uxama-jamil/llm-project-estimator.git>
+   git clone https://github.com/uxama-jamil/llm-project-estimator.git
    cd llm-project-estimator
    ```
 
