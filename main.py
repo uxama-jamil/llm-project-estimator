@@ -56,8 +56,9 @@ class ProjectEstimationSystem:
                     formatted_prompt = self.prompt_template.format(document_content=document_content)
                     
                     # Save prompt to a text file
-                    with open("prompt.txt", "w", encoding="utf-8") as f:
-                        f.write(formatted_prompt)
+                    if(os.getenv("DEBUG").lower() == "true"):
+                        with open("prompt.txt", "w", encoding="utf-8") as f:
+                            f.write(formatted_prompt)
                     
                     # Get LLM response
                     response = self.llm.invoke(formatted_prompt)
@@ -66,8 +67,9 @@ class ProjectEstimationSystem:
                         raise ValueError("Empty or too short response from LLM")
                     
                     print(f"Received response, length: {len(response.content)} characters")
-                    with open("response.txt", "w", encoding="utf-8") as ff:
-                        ff.write(response.content)
+                    if(os.getenv("DEBUG").lower() == "true"):
+                        with open("response.txt", "w", encoding="utf-8") as ff:
+                            ff.write(response.content)
                         
                     # Parse JSON response
                     estimation_data = self.output_parser.parse(response.content)

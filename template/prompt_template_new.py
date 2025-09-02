@@ -61,7 +61,10 @@ Return your response as a valid JSON object with the following structure:
         }},
         ...
       ],
-      "subtotal": "Phase subtotal description"
+      "subtotal": {{
+        "minHours": "Minimum hours required for phase",
+        "maxHours": "Maximum hours required for phase"
+      }}
     }},
     {{
       "name": "GENERAL PHASE", 
@@ -77,7 +80,10 @@ Return your response as a valid JSON object with the following structure:
         }},
         ...
       ],
-      "subtotal": "Phase subtotal description"
+      "subtotal": {{
+        "minHours": "Minimum hours required for phase",
+        "maxHours": "Maximum hours required for phase"
+      }}
     }},
     {{
       "name": "TESTING & QA PHASE",
@@ -93,7 +99,10 @@ Return your response as a valid JSON object with the following structure:
         }},
         ...
       ],
-      "subtotal": "Phase subtotal description"
+      "subtotal": {{
+        "minHours": "Minimum hours required for phase",
+        "maxHours": "Maximum hours required for phase"
+      }}
     }},
     {{
       "name": "DEVELOPMENT PHASE",
@@ -109,7 +118,10 @@ Return your response as a valid JSON object with the following structure:
         }},
         ...
       ],
-      "subtotal": "Phase subtotal description"
+      "subtotal": {{
+        "minHours": "Minimum hours required for phase",
+        "maxHours": "Maximum hours required for phase"
+      }}
     }},
     {{
       "name": "PLANNING & ANALYSIS PHASE",
@@ -125,7 +137,10 @@ Return your response as a valid JSON object with the following structure:
         }},
         ...
       ],
-      "subtotal": "Phase subtotal description"
+      "subtotal": {{
+        "minHours": "Minimum hours required for phase",
+        "maxHours": "Maximum hours required for phase"
+      }}
     }},
     {{
       "name": "DOCUMENTATION PHASE",
@@ -157,7 +172,10 @@ Return your response as a valid JSON object with the following structure:
         }},
         ...
       ],
-      "subtotal": "Phase subtotal description"
+      "subtotal": {{
+        "minHours": "Minimum hours required for phase",
+        "maxHours": "Maximum hours required for phase"
+      }}
     }},
     {{
       "name": "DEPLOYMENT & DEVOPS PHASE",
@@ -173,7 +191,10 @@ Return your response as a valid JSON object with the following structure:
         }},
         ...
       ],
-      "subtotal": "Phase subtotal description"
+      "subtotal": {{
+        "minHours": "Minimum hours required for phase",
+        "maxHours": "Maximum hours required for phase"
+      }}
     }},
     {{
       "name": "PROJECT MANAGEMENT PHASE",
@@ -189,7 +210,10 @@ Return your response as a valid JSON object with the following structure:
         }},
         ...
       ],
-      "subtotal": "Phase subtotal description"
+      "subtotal": {{
+        "minHours": "Minimum hours required for phase",
+        "maxHours": "Maximum hours required for phase"
+      }}
     }},
     {{
       "name": "DATABASE PHASE",
@@ -205,7 +229,10 @@ Return your response as a valid JSON object with the following structure:
         }},
         ...
       ],
-      "subtotal": "Phase subtotal description"
+      "subtotal": {{
+        "minHours": "Minimum hours required for phase",
+        "maxHours": "Maximum hours required for phase"
+      }}
     }},
   ],
   "grandTotal": "Grand Total",

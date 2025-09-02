@@ -24,6 +24,7 @@ def json_to_excel(json_data, output_file_path):
         header_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
         phase_font = Font(bold=True, size=11)
         subtotal_font = Font(bold=True, size=10)
+        subtotal_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")  # Yellow background
         grand_total_font = Font(bold=True, size=12)
         
         # Get project info
@@ -128,8 +129,11 @@ def json_to_excel(json_data, output_file_path):
                         subtotal_hours = f"{min_h}-{max_h}h"
                     else:
                         subtotal_hours = f"{min_h}h"
+                for i in range(len(headers)):
+                    ws.cell(row=current_row, column=i+1).fill = subtotal_fill
                 ws.cell(row=current_row, column=1, value=subtotal_text)
-                ws.cell(row=current_row, column=4, value=subtotal_hours)  # Put hours in Hours column
+                ws.cell(row=current_row, column=4, value=min_h)  # Put hours in Hours column
+                ws.cell(row=current_row, column=5, value=max_h)  # Put hours in Hours column
             else:
                 ws.cell(row=current_row, column=1, value=subtotal)
             ws.cell(row=current_row, column=1).font = subtotal_font
@@ -366,7 +370,10 @@ def test_json_to_excel():
                         "status": "Not Started"
                     }
                 ],
-                "subtotal": "Design & Architecture Subtotal"
+                "subtotal": {
+                    "minHours": 64,
+                    "maxHours": 88
+                }
             },
             {
                 "name": "DEVELOPMENT PHASE",
@@ -381,7 +388,10 @@ def test_json_to_excel():
                         "status": "Not Started"
                     }
                 ],
-                "subtotal": "Development Subtotal"
+                "subtotal": {
+                    "minHours": 80,
+                    "maxHours": 100
+                }
             }
         ],
         "grandTotal": "GRAND TOTAL",
@@ -392,7 +402,20 @@ def test_json_to_excel():
             "recommendedTeamSize": 3,
             "totalTasks": 3,
             "totalPhases": 2
-        }
+        },
+        "risks": [
+            {
+                "risk": "Technical complexity may exceed initial estimates",
+                "phase": "Development Phase",
+                "impact": "High",
+                "mitigation": "Add buffer time and conduct thorough technical review"
+            }
+        ],
+        "recommendations": [
+            "Start with a detailed technical specification",
+            "Consider using proven frameworks to reduce development time"
+        ]
     }
     
     return json_to_excel(sample_data, "test_estimation.xlsx")
+
