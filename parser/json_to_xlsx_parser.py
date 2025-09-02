@@ -24,7 +24,7 @@ def json_to_excel(json_data, output_file_path):
         header_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
         phase_font = Font(bold=True, size=11)
         subtotal_font = Font(bold=True, size=10)
-        subtotal_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")  # Yellow background
+        subtotal_fill = PatternFill(start_color="FFE699", end_color="FFE699", fill_type="solid")  # Yellow background
         grand_total_font = Font(bold=True, size=12)
         
         # Get project info
